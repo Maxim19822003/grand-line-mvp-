@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Гранд Лайн - Рейтинг менеджеров</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #1a202c; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 16px; }
+        
+        .header { background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%); color: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
+        .header h1 { font-size: 24px; margin-bottom: 8px; }
+        .header p { opacity: 0.9; font-size: 14px; }
+        
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .stat-card { background: white; padding: 16px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); text-align: center; }
+        .stat-value { font-size: 28px; font-weight: 700; color: #2563eb; }
+        .stat-label { font-size: 12px; color: #64748b; margin-top: 4px; }
+        
+        .tabs { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; }
+        .tab { padding: 10px 20px; background: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; white-space: nowrap; }
+        .tab.active { background: #2563eb; color: white; }
+        
+        .content { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        
+        .table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        .table th { text-align: left; padding: 12px 8px; color: #64748b; font-weight: 500; border-bottom: 2px solid #e2e8f0; }
+        .table td { padding: 12px 8px; border-bottom: 1px solid #f1f5f9; }
+        .table tr:hover { background: #f8fafc; }
+        .rank { font-weight: 700; font-size: 16px; }
+        .rank-1 { color: #eab308; }
+        .rank-2 { color: #9ca3af; }
+        .rank-3 { color: #b45309; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 500; }
+        .badge-junior { background: #dbeafe; color: #1e40af; }
+        .badge-middle { background: #e0e7ff; color: #4338ca; }
+        .badge-senior { background: #dcfce7; color: #166534; }
+        .score { font-weight: 700; font-size: 18px; }
+        .score-high { color: #22c55e; }
+        .score-mid { color: #2563eb; }
+        .score-low { color: #eab308; }
+        
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 14px; color: #64748b; margin-bottom: 6px; }
+        .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 16px; }
+        .btn { padding: 12px 24px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; width: 100%; }
+        .btn-primary { background: #2563eb; color: white; }
+        .btn-danger { background: #ef4444; color: white; margin-top: 8px; }
+        
+        .manager-card { background: #f8fafc; padding: 16px; border-radius: 8px; margin-bottom: 12px; }
+        .manager-name { font-weight: 600; font-size: 16px; margin-bottom: 4px; }
+        .manager-info { font-size: 13px; color: #64748b; }
+        
+        .metrics-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 16px; }
+        .metric-item { background: white; padding: 12px; border-radius: 8px; text-align: center; }
+        .metric-score { font-size: 20px; font-weight: 700; color: #2563eb; }
+        .metric-name { font-size: 11px; color: #64748b; margin-top: 4px; }
+        
+        .hidden { display: none; }
+        
+        @media (max-width: 640px) {
+            .stats { grid-template-columns: repeat(2, 1fr); }
+            .table { font-size: 12px; }
+            .table th, .table td { padding: 8px 4px; }
+            .badge { padding: 2px 6px; font-size: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏆 Гранд Лайн</h1>
+            <p>Система рейтингования менеджеров по продажам</p>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="totalManagers">6</div>
+                <div class="stat-label">Менеджеров</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="avgRating">74.5</div>
+                <div class="stat-label">Средний рейтинг</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="topScore">85</div>
+                <div class="stat-label">Лучший результат</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">60/40</div>
+                <div class="stat-label">Кол/Кач</div>
+            </div>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('rating')">📊 Рейтинг</button>
+            <button class="tab" onclick="showTab('add')">➕ Добавить</button>
+            <button class="tab" onclick="showTab('detail')">👤 Детали</button>
+            <button class="tab" onclick="showTab('settings')">⚙️ Настройки</button>
+        </div>
+        
+        <div id="rating" class="content">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Менеджер</th>
+                        <th>Опыт</th>
+                        <th>Рейтинг</th>
+                        <th>Финансы</th>
+                    </tr>
+                </thead>
+                <tbody id="ratingTable"></tbody>
+            </table>
+        </div>
+        
+        <div id="add" class="content hidden">
+            <h3 style="margin-bottom: 16px;">Добавить менеджера</h3>
+            <div class="form-group">
+                <label>Имя</label>
+                <input type="text" id="newName" placeholder="Иван Иванов">
+            </div>
+            <div class="form-group">
+                <label>Должность</label>
+                <input type="text" id="newPosition" placeholder="Менеджер по продажам">
+            </div>
+            <div class="form-group">
+                <label>Уровень</label>
+                <select id="newLevel">
+                    <option value="junior">Junior (&lt; 6 мес)</option>
+                    <option value="middle" selected>Middle (6 мес - 2 года)</option>
+                    <option value="senior">Senior (&gt; 2 года)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Финансы (0-100)</label>
+                <input type="number" id="newFinance" min="0" max="100" value="75">
+            </div>
+            <div class="form-group">
+                <label>Воронка (0-100)</label>
+                <input type="number" id="newFunnel" min="0" max="100" value="70">
+            </div>
+            <div class="form-group">
+                <label>Активность (0-100)</label>
+                <input type="number" id="newActivity" min="0" max="100" value="80">
+            </div>
+            <div class="form-group">
+                <label>Техника переговоров (0-100)</label>
+                <input type="number" id="newTech" min="0" max="100" value="70">
+            </div>
+            <div class="form-group">
+                <label>Коммуникация (0-100)</label>
+                <input type="number" id="newComm" min="0" max="100" value="75">
+            </div>
+            <button class="btn btn-primary" onclick="addManager()">Добавить менеджера</button>
+        </div>
+        
+        <div id="detail" class="content hidden">
+            <div id="managerDetail">
+                <p style="color: #64748b; text-align: center;">Выберите менеджера из рейтинга</p>
+            </div>
+        </div>
+        
+        <div id="settings" class="content hidden">
+            <h3 style="margin-bottom: 16px;">Веса метрик</h3>
+            <div class="form-group">
+                <label>Финансы (%)</label>
+                <input type="number" id="weightFinance" value="25" min="0" max="100" onchange="updateWeights()">
+            </div>
+            <div class="form-group">
+                <label>Воронка (%)</label>
+                <input type="number" id="weightFunnel" value="20" min="0" max="100" onchange="updateWeights()">
+            </div>
+            <div class="form-group">
+                <label>Активность (%)</label>
+                <input type="number" id="weightActivity" value="10" min="0" max="100" onchange="updateWeights()">
+            </div>
+            <div class="form-group">
+                <label>Техника (%)</label>
+                <input type="number" id="weightTech" value="15" min="0" max="100" onchange="updateWeights()">
+            </div>
+            <div class="form-group">
+                <label>Коммуникация (%)</label>
+                <input type="number" id="weightComm" value="10" min="0" max="100" onchange="updateWeights()">
+            </div>
+            <p style="color: #64748b; font-size: 14px; margin-top: 12px;">
+                Сумма: <span id="weightSum">80</span>% (рекомендуется 100%)
+            </p>
+            <button class="btn btn-danger" onclick="clearData()">🗑️ Очистить все данные</button>
+        </div>
+    </div>
+
+    <script>
+        const defaultManagers = [
+            { id: 1, name: 'Александр Петров', position: 'Менеджер B2B', level: 'middle', finance: 82, funnel: 76, activity: 85, tech: 70, comm: 74 },
+            { id: 2, name: 'Елена Смирнова', position: 'Старший менеджер', level: 'senior', finance: 78, funnel: 72, activity: 80, tech: 73, comm: 70 },
+            { id: 3, name: 'Дмитрий Иванов', position: 'Менеджер', level: 'junior', finance: 70, funnel: 68, activity: 75, tech: 65, comm: 62 },
+            { id: 4, name: 'Мария Козлова', position: 'Менеджер', level: 'middle', finance: 75, funnel: 70, activity: 78, tech: 68, comm: 72 },
+            { id: 5, name: 'Сергей Новиков', position: 'Ведущий менеджер', level: 'senior', finance: 72, funnel: 74, activity: 70, tech: 75, comm: 68 },
+            { id: 6, name: 'Анна Морозова', position: 'Менеджер', level: 'junior', finance: 65, funnel: 62, activity: 70, tech: 58, comm: 60 }
+        ];
+        
+        let weights = { finance: 25, funnel: 20, activity: 10, tech: 15, comm: 10 };
+        let managers = JSON.parse(localStorage.getItem('gl_managers')) || defaultManagers;
+        
+        function calculateRating(m) {
+            const quantitative = (m.finance * weights.finance + m.funnel * weights.funnel + m.activity * weights.activity) / (weights.finance + weights.funnel + weights.activity);
+            const qualitative = (m.tech * weights.tech + m.comm * weights.comm) / (weights.tech + weights.comm);
+            const totalQuantWeight = weights.finance + weights.funnel + weights.activity;
+            const totalQualWeight = weights.tech + weights.comm;
+            const totalWeight = totalQuantWeight + totalQualWeight;
+            return ((quantitative * totalQuantWeight + qualitative * totalQualWeight) / totalWeight).toFixed(1);
+        }
+        
+        function renderRating() {
+            const sorted = [...managers].sort((a, b) => calculateRating(b) - calculateRating(a));
+            const tbody = document.getElementById('ratingTable');
+            tbody.innerHTML = sorted.map((m, i) => {
+                const rating = calculateRating(m);
+                let scoreClass = rating >= 80 ? 'score-high' : rating >= 70 ? 'score-mid' : 'score-low';
+                let rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : '';
+                let badgeClass = `badge-${m.level}`;
+                let levelText = m.level === 'junior' ? 'Junior' : m.level === 'middle' ? 'Middle' : 'Senior';
+                return `
+                    <tr onclick="showManager(${m.id})" style="cursor: pointer;">
+                        <td class="rank ${rankClass}">${i + 1}</td>
+                        <td>
+                            <div class="manager-name">${m.name}</div>
+                            <div class="manager-info">${m.position}</div>
+                        </td>
+                        <td><span class="badge ${badgeClass}">${levelText}</span></td>
+                        <td class="score ${scoreClass}">${rating}</td>
+                        <td>${m.finance}</td>
+                    </tr>
+                `;
+            }).join('');
+            
+            document.getElementById('totalManagers').textContent = managers.length;
+            const avg = (sorted.reduce((sum, m) => sum + parseFloat(calculateRating(m)), 0) / sorted.length).toFixed(1);
+            document.getElementById('avgRating').textContent = avg;
+            document.getElementById('topScore').textContent = Math.max(...sorted.map(m => parseFloat(calculateRating(m))));
+        }
+        
+        function showManager(id) {
+            const m = managers.find(x => x.id === id);
+            if (!m) return;
+            const rating = calculateRating(m);
+            document.getElementById('managerDetail').innerHTML = `
+                <div class="manager-card">
+                    <div class="manager-name">${m.name}</div>
+                    <div class="manager-info">${m.position} • ${m.level === 'junior' ? 'Junior' : m.level === 'middle' ? 'Middle' : 'Senior'}</div>
+                </div>
+                <div style="text-align: center; margin: 20px 0;">
+                    <div style="font-size: 48px; font-weight: 700; color: #2563eb;">${rating}</div>
+                    <div style="color: #64748b;">Общий рейтинг</div>
+                </div>
+                <div class="metrics-grid">
+                    <div class="metric-item">
+                        <div class="metric-score">${m.finance}</div>
+                        <div class="metric-name">Финансы (${weights.finance}%)</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-score">${m.funnel}</div>
+                        <div class="metric-name">Воронка (${weights.funnel}%)</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-score">${m.activity}</div>
+                        <div class="metric-name">Активность (${weights.activity}%)</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-score">${m.tech}</div>
+                        <div class="metric-name">Техника (${weights.tech}%)</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-score">${m.comm}</div>
+                        <div class="metric-name">Коммуникация (${weights.comm}%)</div>
+                    </div>
+                </div>
+                <button class="btn btn-danger" onclick="deleteManager(${m.id})" style="margin-top: 20px;">Удалить менеджера</button>
+            `;
+            showTab('detail');
+        }
+        
+        function addManager() {
+            const name = document.getElementById('newName').value;
+            const position = document.getElementById('newPosition').value;
+            const level = document.getElementById('newLevel').value;
+            const finance = parseInt(document.getElementById('newFinance').value) || 50;
+            const funnel = parseInt(document.getElementById('newFunnel').value) || 50;
+            const activity = parseInt(document.getElementById('newActivity').value) || 50;
+            const tech = parseInt(document.getElementById('newTech').value) || 50;
+            const comm = parseInt(document.getElementById('newComm').value) || 50;
+            
+            if (!name) { alert('Введите имя'); return; }
+            
+            managers.push({ id: Date.now(), name, position, level, finance, funnel, activity, tech, comm });
+            localStorage.setItem('gl_managers', JSON.stringify(managers));
+            document.getElementById('newName').value = '';
+            document.getElementById('newPosition').value = '';
+            alert('Менеджер добавлен!');
+            showTab('rating');
+            renderRating();
+        }
+        
+        function deleteManager(id) {
+            if (!confirm('Удалить менеджера?')) return;
+            managers = managers.filter(m => m.id !== id);
+            localStorage.setItem('gl_managers', JSON.stringify(managers));
+            showTab('rating');
+            renderRating();
+        }
+        
+        function updateWeights() {
+            weights.finance = parseInt(document.getElementById('weightFinance').value) || 25;
+            weights.funnel = parseInt(document.getElementById('weightFunnel').value) || 20;
+            weights.activity = parseInt(document.getElementById('weightActivity').value) || 10;
+            weights.tech = parseInt(document.getElementById('weightTech').value) || 15;
+            weights.comm = parseInt(document.getElementById('weightComm').value) || 10;
+            const sum = weights.finance + weights.funnel + weights.activity + weights.tech + weights.comm;
+            document.getElementById('weightSum').textContent = sum;
+            document.getElementById('weightSum').style.color = sum === 100 ? '#22c55e' : '#ef4444';
+            renderRating();
+        }
+        
+        function clearData() {
+            if (!confirm('Очистить все данные?')) return;
+            localStorage.removeItem('gl_managers');
+            managers = [...defaultManagers];
+            renderRating();
+            alert('Данные очищены!');
+        }
+        
+        function showTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.content').forEach(c => c.classList.add('hidden'));
+            document.getElementById(tabName).classList.remove('hidden');
+            event.target.classList.add('active');
+        }
+        
+        renderRating();
+        updateWeights();
+    </script>
+</body>
+</html>
