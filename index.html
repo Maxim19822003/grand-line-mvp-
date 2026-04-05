@@ -21,9 +21,10 @@
         }
         
         .logo-img {
-            height: 500px;
-            max-width: 100%;
-            object-fit: contain;
+            width: 100%;        /* На всю ширину контейнера */
+            max-width: 100%;    /* Убрали ограничение */
+            height: auto;       /* Автоматическая высота пропорционально */
+            max-height: 200px;  /* Максимум 200px по высоте (подбери под свой логотип) */
         }
         
         .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
