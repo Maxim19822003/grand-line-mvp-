@@ -9,10 +9,9 @@
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #F5F5F5; color: #1A1A1A; }
         .container { max-width: 1200px; margin: 0 auto; padding: 16px; }
         
-        /* Header с логотипом */
         .header { 
             background: #FFFFFF; 
-            padding: 16px 20px; 
+            padding: 20px 16px;
             border-radius: 12px; 
             margin-bottom: 20px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
@@ -22,9 +21,9 @@
         }
         
         .logo-img {
-            height: 200px;           /* Высота логотипа */
-            max-width: 100%;         /* Не больше 90% ширины */
-            object-fit: contain;    /* Сохраняет пропорции */
+            height: 200px;
+            max-width: 95%;
+            object-fit: contain;
         }
         
         .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
@@ -53,9 +52,18 @@
         .form-group { margin-bottom: 16px; }
         .form-group label { display: block; font-size: 14px; color: #666; margin-bottom: 6px; font-weight: 500; }
         .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; }
-        .btn { padding: 14px 24px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; width: 100%; font-weight: 600; }
+        .btn { padding: 14px 24px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; width: 100%; font-weight: 600; margin-bottom: 8px; }
         .btn-primary { background: #E31E24; color: white; }
-        .btn-danger { background: #1A1A1A; color: white; margin-top: 8px; }
+        .btn-secondary { background: #f0f0f0; color: #333; }
+        .btn-danger { background: #1A1A1A; color: white; }
+        
+        .slider-container { margin-bottom: 20px; }
+        .slider-label { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; }
+        .slider-label span:first-child { color: #666; }
+        .slider-label span:last-child { color: #E31E24; font-weight: 600; }
+        .slider { width: 100%; height: 8px; border-radius: 4px; background: #e0e0e0; outline: none; -webkit-appearance: none; }
+        .slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 24px; height: 24px; border-radius: 50%; background: #E31E24; cursor: pointer; }
+        .slider::-moz-range-thumb { width: 24px; height: 24px; border-radius: 50%; background: #E31E24; cursor: pointer; border: none; }
         
         .manager-card { background: #f9f9f9; padding: 16px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid #E31E24; }
         .manager-name { font-weight: 600; font-size: 18px; margin-bottom: 4px; }
@@ -67,11 +75,17 @@
         .metric-name { font-size: 12px; color: #666; margin-top: 4px; }
         
         .hidden { display: none; }
+        .hint { color: #999; font-size: 13px; text-align: center; padding: 20px; }
+        
+        @media (max-width: 640px) {
+            .stats { grid-template-columns: repeat(2, 1fr); }
+            .table { font-size: 12px; }
+            .logo-img { height: 80px; }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Логотип из папки assets -->
         <div class="header">
             <img src="assets/logo.png" alt="Grand Line - Рейтинг менеджеров" class="logo-img">
         </div>
@@ -103,6 +117,7 @@
         </div>
         
         <div id="rating" class="content">
+            <p class="hint">👆 Нажмите на менеджера, чтобы редактировать</p>
             <table class="table">
                 <thead>
                     <tr><th>#</th><th>Менеджер</th><th>Опыт</th><th>Рейтинг</th><th>Финансы</th></tr>
@@ -112,7 +127,9 @@
         </div>
         
         <div id="add" class="content hidden">
-            <h3 style="margin-bottom: 20px;">Добавить менеджера</h3>
+            <h3 style="margin-bottom: 20px;" id="formTitle">Добавить менеджера</h3>
+            <input type="hidden" id="editId" value="">
+            
             <div class="form-group">
                 <label>Имя</label>
                 <input type="text" id="newName" placeholder="Иван Иванов">
@@ -124,66 +141,80 @@
             <div class="form-group">
                 <label>Уровень</label>
                 <select id="newLevel">
-                    <option value="junior">Junior</option>
-                    <option value="middle" selected>Middle</option>
-                    <option value="senior">Senior</option>
+                    <option value="junior">Junior (&lt; 6 мес)</option>
+                    <option value="middle" selected>Middle (6 мес - 2 года)</option>
+                    <option value="senior">Senior (&gt; 2 года)</option>
                 </select>
             </div>
-            <div class="form-group">
-                <label>Финансы (0-100)</label>
-                <input type="number" id="newFinance" min="0" max="100" value="75">
+            
+            <div class="slider-container">
+                <div class="slider-label"><span>Финансы</span><span id="valFinance">75</span></div>
+                <input type="range" id="newFinance" class="slider" min="0" max="100" value="75" oninput="updateSlider('Finance')">
             </div>
-            <div class="form-group">
-                <label>Воронка (0-100)</label>
-                <input type="number" id="newFunnel" min="0" max="100" value="70">
+            
+            <div class="slider-container">
+                <div class="slider-label"><span>Воронка</span><span id="valFunnel">70</span></div>
+                <input type="range" id="newFunnel" class="slider" min="0" max="100" value="70" oninput="updateSlider('Funnel')">
             </div>
-            <div class="form-group">
-                <label>Активность (0-100)</label>
-                <input type="number" id="newActivity" min="0" max="100" value="80">
+            
+            <div class="slider-container">
+                <div class="slider-label"><span>Активность</span><span id="valActivity">80</span></div>
+                <input type="range" id="newActivity" class="slider" min="0" max="100" value="80" oninput="updateSlider('Activity')">
             </div>
-            <div class="form-group">
-                <label>Техника переговоров (0-100)</label>
-                <input type="number" id="newTech" min="0" max="100" value="70">
+            
+            <div class="slider-container">
+                <div class="slider-label"><span>Техника переговоров</span><span id="valTech">70</span></div>
+                <input type="range" id="newTech" class="slider" min="0" max="100" value="70" oninput="updateSlider('Tech')">
             </div>
-            <div class="form-group">
-                <label>Коммуникация (0-100)</label>
-                <input type="number" id="newComm" min="0" max="100" value="75">
+            
+            <div class="slider-container">
+                <div class="slider-label"><span>Коммуникация</span><span id="valComm">75</span></div>
+                <input type="range" id="newComm" class="slider" min="0" max="100" value="75" oninput="updateSlider('Comm')">
             </div>
-            <button class="btn btn-primary" onclick="addManager()">Добавить менеджера</button>
+            
+            <button class="btn btn-primary" id="saveBtn" onclick="saveManager()">Добавить менеджера</button>
+            <button class="btn btn-secondary hidden" id="cancelBtn" onclick="cancelEdit()">Отмена</button>
         </div>
         
         <div id="detail" class="content hidden">
             <div id="managerDetail">
-                <p style="color: #666; text-align: center; padding: 40px;">Выберите менеджера из рейтинга</p>
+                <p class="hint">Выберите менеджера из рейтинга</p>
             </div>
         </div>
         
         <div id="settings" class="content hidden">
-            <h3 style="margin-bottom: 20px;">Веса метрик</h3>
-            <div class="form-group">
-                <label>Финансы (%)</label>
-                <input type="number" id="weightFinance" value="25" min="0" max="100" onchange="updateWeights()">
+            <h3 style="margin-bottom: 20px;">Веса метрик (всего должно быть 100%)</h3>
+            
+            <div class="slider-container">
+                <div class="slider-label"><span>Финансы (%)</span><span id="weightValFinance">25</span></div>
+                <input type="range" id="weightFinance" class="slider" min="0" max="50" value="25" oninput="updateWeightSlider('Finance')">
             </div>
-            <div class="form-group">
-                <label>Воронка (%)</label>
-                <input type="number" id="weightFunnel" value="20" min="0" max="100" onchange="updateWeights()">
+            
+            <div class="slider-container">
+                <div class="slider-label"><span>Воронка (%)</span><span id="weightValFunnel">20</span></div>
+                <input type="range" id="weightFunnel" class="slider" min="0" max="50" value="20" oninput="updateWeightSlider('Funnel')">
             </div>
-            <div class="form-group">
-                <label>Активность (%)</label>
-                <input type="number" id="weightActivity" value="10" min="0" max="100" onchange="updateWeights()">
+            
+            <div class="slider-container">
+                <div class="slider-label"><span>Активность (%)</span><span id="weightValActivity">10</span></div>
+                <input type="range" id="weightActivity" class="slider" min="0" max="50" value="10" oninput="updateWeightSlider('Activity')">
             </div>
-            <div class="form-group">
-                <label>Техника (%)</label>
-                <input type="number" id="weightTech" value="15" min="0" max="100" onchange="updateWeights()">
+            
+            <div class="slider-container">
+                <div class="slider-label"><span>Техника (%)</span><span id="weightValTech">15</span></div>
+                <input type="range" id="weightTech" class="slider" min="0" max="50" value="15" oninput="updateWeightSlider('Tech')">
             </div>
-            <div class="form-group">
-                <label>Коммуникация (%)</label>
-                <input type="number" id="weightComm" value="10" min="0" max="100" onchange="updateWeights()">
+            
+            <div class="slider-container">
+                <div class="slider-label"><span>Коммуникация (%)</span><span id="weightValComm">10</span></div>
+                <input type="range" id="weightComm" class="slider" min="0" max="50" value="10" oninput="updateWeightSlider('Comm')">
             </div>
-            <p style="color: #666; font-size: 14px; margin: 16px 0;">
-                Сумма: <span id="weightSum" style="font-weight: 600;">80</span>%
+            
+            <p style="color: #666; font-size: 14px; margin: 20px 0; text-align: center;">
+                Сумма: <span id="weightSum" style="font-weight: 700; color: #E31E24;">80</span>%
             </p>
-            <button class="btn btn-danger" onclick="clearData()">Очистить данные</button>
+            
+            <button class="btn btn-danger" onclick="clearData()">🗑️ Очистить все данные</button>
         </div>
     </div>
 
@@ -199,6 +230,7 @@
         
         let weights = { finance: 25, funnel: 20, activity: 10, tech: 15, comm: 10 };
         let managers = JSON.parse(localStorage.getItem('gl_managers')) || defaultManagers;
+        let editingId = null;
         
         function calculateRating(m) {
             const quantitative = (m.finance * weights.finance + m.funnel * weights.funnel + m.activity * weights.activity) / (weights.finance + weights.funnel + weights.activity);
@@ -217,7 +249,7 @@
                 let rankClass = i === 0 ? 'rank-1' : '';
                 let badgeClass = `badge-${m.level}`;
                 let levelText = m.level === 'junior' ? 'Junior' : m.level === 'middle' ? 'Middle' : 'Senior';
-                return '<tr onclick="showManager(' + m.id + ')" style="cursor: pointer;"><td class="rank ' + rankClass + '">' + (i + 1) + '</td><td><div class="manager-name">' + m.name + '</div><div class="manager-info">' + m.position + '</div></td><td><span class="badge ' + badgeClass + '">' + levelText + '</span></td><td class="score">' + rating + '</td><td>' + m.finance + '</td></tr>';
+                return '<tr onclick="editManager(' + m.id + ')" style="cursor: pointer;"><td class="rank ' + rankClass + '">' + (i + 1) + '</td><td><div class="manager-name">' + m.name + '</div><div class="manager-info">' + m.position + '</div></td><td><span class="badge ' + badgeClass + '">' + levelText + '</span></td><td class="score">' + rating + '</td><td>' + m.finance + '</td></tr>';
             }).join('');
             
             document.getElementById('totalManagers').textContent = managers.length;
@@ -226,35 +258,102 @@
             document.getElementById('topScore').textContent = Math.max(...sorted.map(m => parseFloat(calculateRating(m))));
         }
         
-        function showManager(id) {
-            const m = managers.find(x => x.id === id);
-            if (!m) return;
-            const rating = calculateRating(m);
-            document.getElementById('managerDetail').innerHTML = '<div class="manager-card"><div class="manager-name">' + m.name + '</div><div class="manager-info">' + m.position + ' • ' + (m.level === 'junior' ? 'Junior' : m.level === 'middle' ? 'Middle' : 'Senior') + '</div></div><div style="text-align: center; margin: 24px 0;"><div style="font-size: 56px; font-weight: 700; color: #E31E24;">' + rating + '</div><div style="color: #666; font-size: 16px;">Общий рейтинг</div></div><div class="metrics-grid"><div class="metric-item"><div class="metric-score">' + m.finance + '</div><div class="metric-name">Финансы (' + weights.finance + '%)</div></div><div class="metric-item"><div class="metric-score">' + m.funnel + '</div><div class="metric-name">Воронка (' + weights.funnel + '%)</div></div><div class="metric-item"><div class="metric-score">' + m.activity + '</div><div class="metric-name">Активность (' + weights.activity + '%)</div></div><div class="metric-item"><div class="metric-score">' + m.tech + '</div><div class="metric-name">Техника (' + weights.tech + '%)</div></div><div class="metric-item"><div class="metric-score">' + m.comm + '</div><div class="metric-name">Коммуникация (' + weights.comm + '%)</div></div></div><button class="btn btn-danger" onclick="deleteManager(' + m.id + ')" style="margin-top: 24px;">Удалить менеджера</button>';
-            showTab('detail');
+        function updateSlider(name) {
+            const val = document.getElementById('new' + name).value;
+            document.getElementById('val' + name).textContent = val;
         }
         
-        function addManager() {
+        function updateWeightSlider(name) {
+            const val = document.getElementById('weight' + name).value;
+            document.getElementById('weightVal' + name).textContent = val;
+            weights[name.toLowerCase()] = parseInt(val);
+            updateWeightSum();
+            renderRating();
+        }
+        
+        function updateWeightSum() {
+            const sum = weights.finance + weights.funnel + weights.activity + weights.tech + weights.comm;
+            document.getElementById('weightSum').textContent = sum;
+            document.getElementById('weightSum').style.color = sum === 100 ? '#22c55e' : '#E31E24';
+        }
+        
+        function saveManager() {
             const name = document.getElementById('newName').value;
             const position = document.getElementById('newPosition').value;
             const level = document.getElementById('newLevel').value;
-            const finance = parseInt(document.getElementById('newFinance').value) || 50;
-            const funnel = parseInt(document.getElementById('newFunnel').value) || 50;
-            const activity = parseInt(document.getElementById('newActivity').value) || 50;
-            const tech = parseInt(document.getElementById('newTech').value) || 50;
-            const comm = parseInt(document.getElementById('newComm').value) || 50;
+            const finance = parseInt(document.getElementById('newFinance').value);
+            const funnel = parseInt(document.getElementById('newFunnel').value);
+            const activity = parseInt(document.getElementById('newActivity').value);
+            const tech = parseInt(document.getElementById('newTech').value);
+            const comm = parseInt(document.getElementById('newComm').value);
             
             if (!name) { alert('Введите имя'); return; }
             
-            managers.push({ id: Date.now(), name, position, level, finance, funnel, activity, tech, comm });
+            if (editingId) {
+                const idx = managers.findIndex(m => m.id === editingId);
+                if (idx >= 0) {
+                    managers[idx] = { id: editingId, name, position, level, finance, funnel, activity, tech, comm };
+                }
+                editingId = null;
+            } else {
+                managers.push({ id: Date.now(), name, position, level, finance, funnel, activity, tech, comm });
+            }
+            
             localStorage.setItem('gl_managers', JSON.stringify(managers));
-            
-            document.getElementById('newName').value = '';
-            document.getElementById('newPosition').value = '';
-            
-            alert('Менеджер добавлен!');
+            resetForm();
             showTab('rating');
             renderRating();
+        }
+        
+        function editManager(id) {
+            const m = managers.find(x => x.id === id);
+            if (!m) return;
+            
+            editingId = id;
+            document.getElementById('formTitle').textContent = 'Редактировать менеджера';
+            document.getElementById('saveBtn').textContent = 'Сохранить изменения';
+            document.getElementById('cancelBtn').classList.remove('hidden');
+            
+            document.getElementById('newName').value = m.name;
+            document.getElementById('newPosition').value = m.position;
+            document.getElementById('newLevel').value = m.level;
+            document.getElementById('newFinance').value = m.finance;
+            document.getElementById('newFunnel').value = m.funnel;
+            document.getElementById('newActivity').value = m.activity;
+            document.getElementById('newTech').value = m.tech;
+            document.getElementById('newComm').value = m.comm;
+            
+            updateSlider('Finance');
+            updateSlider('Funnel');
+            updateSlider('Activity');
+            updateSlider('Tech');
+            updateSlider('Comm');
+            
+            showTab('add');
+        }
+        
+        function cancelEdit() {
+            resetForm();
+            showTab('rating');
+        }
+        
+        function resetForm() {
+            editingId = null;
+            document.getElementById('formTitle').textContent = 'Добавить менеджера';
+            document.getElementById('saveBtn').textContent = 'Добавить менеджера';
+            document.getElementById('cancelBtn').classList.add('hidden');
+            document.getElementById('newName').value = '';
+            document.getElementById('newPosition').value = '';
+            document.getElementById('newFinance').value = 75;
+            document.getElementById('newFunnel').value = 70;
+            document.getElementById('newActivity').value = 80;
+            document.getElementById('newTech').value = 70;
+            document.getElementById('newComm').value = 75;
+            updateSlider('Finance');
+            updateSlider('Funnel');
+            updateSlider('Activity');
+            updateSlider('Tech');
+            updateSlider('Comm');
         }
         
         function deleteManager(id) {
@@ -262,20 +361,6 @@
             managers = managers.filter(m => m.id !== id);
             localStorage.setItem('gl_managers', JSON.stringify(managers));
             showTab('rating');
-            renderRating();
-        }
-        
-        function updateWeights() {
-            weights.finance = parseInt(document.getElementById('weightFinance').value) || 25;
-            weights.funnel = parseInt(document.getElementById('weightFunnel').value) || 20;
-            weights.activity = parseInt(document.getElementById('weightActivity').value) || 10;
-            weights.tech = parseInt(document.getElementById('weightTech').value) || 15;
-            weights.comm = parseInt(document.getElementById('weightComm').value) || 10;
-            
-            const sum = weights.finance + weights.funnel + weights.activity + weights.tech + weights.comm;
-            document.getElementById('weightSum').textContent = sum;
-            document.getElementById('weightSum').style.color = sum === 100 ? '#009900' : '#E31E24';
-            
             renderRating();
         }
         
@@ -292,10 +377,14 @@
             document.querySelectorAll('.content').forEach(c => c.classList.add('hidden'));
             document.getElementById(tabName).classList.remove('hidden');
             event.target.classList.add('active');
+            
+            if (tabName === 'detail') {
+                document.getElementById('managerDetail').innerHTML = '<p class="hint">Нажмите на менеджера в рейтинге, чтобы увидеть детали</p>';
+            }
         }
         
         renderRating();
-        updateWeights();
+        updateWeightSum();
     </script>
 </body>
 </html>
