@@ -9,6 +9,7 @@
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #F5F5F5; color: #1A1A1A; }
         .container { max-width: 1200px; margin: 0 auto; padding: 16px; }
         
+        /* Header с логотипом */
         .header { 
             background: #FFFFFF; 
             padding: 16px 20px; 
@@ -17,59 +18,25 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             display: flex;
             align-items: center;
-            gap: 16px;
-        }
-        
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        
-        .logo-icon {
-            width: 48px;
-            height: 48px;
-            background: #E31E24;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
             justify-content: center;
         }
         
-        .logo-icon svg {
-            width: 32px;
-            height: 32px;
-            fill: white;
+        .logo-img {
+            height: 70px;           /* Высота логотипа */
+            max-width: 90%;         /* Не больше 90% ширины */
+            object-fit: contain;    /* Сохраняет пропорции */
         }
         
-        .logo-text {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .logo-brand {
-            font-size: 22px;
-            font-weight: 700;
-            color: #1A1A1A;
-            letter-spacing: 0.5px;
-        }
-        
-        .logo-subtitle {
-            font-size: 14px;
-            color: #E31E24;
-            font-weight: 500;
-        }
-        
-        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
         .stat-card { background: white; padding: 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); text-align: center; }
-        .stat-value { font-size: 28px; font-weight: 700; color: #E31E24; }
-        .stat-label { font-size: 12px; color: #666; margin-top: 4px; }
+        .stat-value { font-size: 32px; font-weight: 700; color: #E31E24; }
+        .stat-label { font-size: 13px; color: #666; margin-top: 4px; }
         
         .tabs { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; }
-        .tab { padding: 10px 20px; background: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; white-space: nowrap; color: #666; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+        .tab { padding: 12px 20px; background: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; white-space: nowrap; color: #666; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
         .tab.active { background: #E31E24; color: white; }
         
-        .content { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .content { background: white; border-radius: 12px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
         
         .table { width: 100%; border-collapse: collapse; font-size: 14px; }
         .table th { text-align: left; padding: 12px 8px; color: #666; font-weight: 600; border-bottom: 2px solid #E31E24; }
@@ -81,21 +48,17 @@
         .badge-junior { background: #e8f4fd; color: #0066cc; }
         .badge-middle { background: #f0e6ff; color: #6600cc; }
         .badge-senior { background: #e6f7e6; color: #009900; }
-        .score { font-weight: 700; font-size: 18px; }
-        .score-high { color: #009900; }
-        .score-mid { color: #E31E24; }
-        .score-low { color: #ff9900; }
+        .score { font-weight: 700; font-size: 18px; color: #E31E24; }
         
         .form-group { margin-bottom: 16px; }
         .form-group label { display: block; font-size: 14px; color: #666; margin-bottom: 6px; font-weight: 500; }
         .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; }
-        .form-group input:focus { border-color: #E31E24; outline: none; }
         .btn { padding: 14px 24px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; width: 100%; font-weight: 600; }
         .btn-primary { background: #E31E24; color: white; }
         .btn-danger { background: #1A1A1A; color: white; margin-top: 8px; }
         
         .manager-card { background: #f9f9f9; padding: 16px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid #E31E24; }
-        .manager-name { font-weight: 600; font-size: 18px; margin-bottom: 4px; color: #1A1A1A; }
+        .manager-name { font-weight: 600; font-size: 18px; margin-bottom: 4px; }
         .manager-info { font-size: 14px; color: #666; }
         
         .metrics-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 16px; }
@@ -104,22 +67,13 @@
         .metric-name { font-size: 12px; color: #666; margin-top: 4px; }
         
         .hidden { display: none; }
-        
-        @media (max-width: 640px) {
-            .stats { grid-template-columns: repeat(2, 1fr); }
-            .table { font-size: 12px; }
-            .header { flex-direction: column; align-items: flex-start; }
-            .logo-brand { font-size: 18px; }
-        }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Header с логотипом Гранд Лайн -->
+        <!-- Логотип из папки assets -->
         <div class="header">
-            <div class="logo">
-                <img src="assets/logo.png" alt="Grand Line - Рейтинг менеджеров" style="height: 50px; max-width: 250px; object-fit: contain;">
-            </div>
+            <img src="assets/logo.png" alt="Grand Line - Рейтинг менеджеров" class="logo-img">
         </div>
         
         <div class="stats">
@@ -158,7 +112,7 @@
         </div>
         
         <div id="add" class="content hidden">
-            <h3 style="margin-bottom: 20px; color: #1A1A1A;">Добавить менеджера</h3>
+            <h3 style="margin-bottom: 20px;">Добавить менеджера</h3>
             <div class="form-group">
                 <label>Имя</label>
                 <input type="text" id="newName" placeholder="Иван Иванов">
@@ -170,9 +124,9 @@
             <div class="form-group">
                 <label>Уровень</label>
                 <select id="newLevel">
-                    <option value="junior">Junior (&lt; 6 мес)</option>
-                    <option value="middle" selected>Middle (6 мес - 2 года)</option>
-                    <option value="senior">Senior (&gt; 2 года)</option>
+                    <option value="junior">Junior</option>
+                    <option value="middle" selected>Middle</option>
+                    <option value="senior">Senior</option>
                 </select>
             </div>
             <div class="form-group">
@@ -205,7 +159,7 @@
         </div>
         
         <div id="settings" class="content hidden">
-            <h3 style="margin-bottom: 20px; color: #1A1A1A;">Веса метрик</h3>
+            <h3 style="margin-bottom: 20px;">Веса метрик</h3>
             <div class="form-group">
                 <label>Финансы (%)</label>
                 <input type="number" id="weightFinance" value="25" min="0" max="100" onchange="updateWeights()">
@@ -227,9 +181,9 @@
                 <input type="number" id="weightComm" value="10" min="0" max="100" onchange="updateWeights()">
             </div>
             <p style="color: #666; font-size: 14px; margin: 16px 0;">
-                Сумма: <span id="weightSum" style="font-weight: 600;">80</span>% (рекомендуется 100%)
+                Сумма: <span id="weightSum" style="font-weight: 600;">80</span>%
             </p>
-            <button class="btn btn-danger" onclick="clearData()">🗑️ Очистить все данные</button>
+            <button class="btn btn-danger" onclick="clearData()">Очистить данные</button>
         </div>
     </div>
 
@@ -244,7 +198,7 @@
         ];
         
         let weights = { finance: 25, funnel: 20, activity: 10, tech: 15, comm: 10 };
-n        let managers = JSON.parse(localStorage.getItem('gl_managers')) || defaultManagers;
+        let managers = JSON.parse(localStorage.getItem('gl_managers')) || defaultManagers;
         
         function calculateRating(m) {
             const quantitative = (m.finance * weights.finance + m.funnel * weights.funnel + m.activity * weights.activity) / (weights.finance + weights.funnel + weights.activity);
@@ -260,116 +214,88 @@ n        let managers = JSON.parse(localStorage.getItem('gl_managers')) || defau
             const tbody = document.getElementById('ratingTable');
             tbody.innerHTML = sorted.map((m, i) => {
                 const rating = calculateRating(m);
-                let scoreClass = rating >= 80 ? 'score-high' : rating >= 70 ? 'score-mid' : 'score-low';
                 let rankClass = i === 0 ? 'rank-1' : '';
                 let badgeClass = `badge-${m.level}`;
                 let levelText = m.level === 'junior' ? 'Junior' : m.level === 'middle' ? 'Middle' : 'Senior';
-                return `
-                    <tr onclick=\"showManager(${m.id})\" style=\"cursor: pointer;\">\n
-                        <td class=\"rank ${rankClass}\">${i + 1}</td>\n
-                        <td>\n
-                            <div class=\"manager-name\">${m.name}</div>\n
-                            <div class=\"manager-info\">${m.position}</div>\n
-                        </td>\n
-                        <td><span class=\"badge ${badgeClass}\">${levelText}</span></td>\n
-                        <td class=\"score ${scoreClass}\">${rating}</td>\n
-                        <td>${m.finance}</td>\n
-                    </tr>\n
-                `;
+                return '<tr onclick="showManager(' + m.id + ')" style="cursor: pointer;"><td class="rank ' + rankClass + '">' + (i + 1) + '</td><td><div class="manager-name">' + m.name + '</div><div class="manager-info">' + m.position + '</div></td><td><span class="badge ' + badgeClass + '">' + levelText + '</span></td><td class="score">' + rating + '</td><td>' + m.finance + '</td></tr>';
             }).join('');
-            \n            document.getElementById('totalManagers').textContent = managers.length;\n
-            const avg = (sorted.reduce((sum, m) => sum + parseFloat(calculateRating(m)), 0) / sorted.length).toFixed(1);\n
-            document.getElementById('avgRating').textContent = avg;\n
-            document.getElementById('topScore').textContent = Math.max(...sorted.map(m => parseFloat(calculateRating(m))));\n
-        }\n
-        \n
-        function showManager(id) {\n
-            const m = managers.find(x => x.id === id);\n
-            if (!m) return;\n
-            const rating = calculateRating(m);\n
-            document.getElementById('managerDetail').innerHTML = `\n
-                <div class=\"manager-card\">\n
-                    <div class=\"manager-name\">${m.name}</div>\n
-                    <div class=\"manager-info\">${m.position} • ${m.level === 'junior' ? 'Junior' : m.level === 'middle' ? 'Middle' : 'Senior'}</div>\n
-                </div>\n
-                <div style=\"text-align: center; margin: 24px 0;\">\n
-                    <div style=\"font-size: 56px; font-weight: 700; color: #E31E24;\">${rating}</div>\n
-                    <div style=\"color: #666; font-size: 16px;\">Общий рейтинг</div>\n
-                </div>\n
-                <div class=\"metrics-grid\">\n
-                    <div class=\"metric-item\"><div class=\"metric-score\">${m.finance}</div><div class=\"metric-name\">Финансы (${weights.finance}%)</div></div>\n
-                    <div class=\"metric-item\"><div class=\"metric-score\">${m.funnel}</div><div class=\"metric-name\">Воронка (${weights.funnel}%)</div></div>\n
-                    <div class=\"metric-item\"><div class=\"metric-score\">${m.activity}</div><div class=\"metric-name\">Активность (${weights.activity}%)</div></div>\n
-                    <div class=\"metric-item\"><div class=\"metric-score\">${m.tech}</div><div class=\"metric-name\">Техника (${weights.tech}%)</div></div>\n
-                    <div class=\"metric-item\"><div class=\"metric-score\">${m.comm}</div><div class=\"metric-name\">Коммуникация (${weights.comm}%)</div></div>\n
-                </div>\n
-                <button class=\"btn btn-danger\" onclick=\"deleteManager(${m.id})\" style=\"margin-top: 24px;\">Удалить менеджера</button>\n
-            `;\n
-            showTab('detail');\n
-        }\n
-        \n
-        function addManager() {\n
-            const name = document.getElementById('newName').value;\n
-            const position = document.getElementById('newPosition').value;\n
-            const level = document.getElementById('newLevel').value;\n
-            const finance = parseInt(document.getElementById('newFinance').value) || 50;\n
-            const funnel = parseInt(document.getElementById('newFunnel').value) || 50;\n
-            const activity = parseInt(document.getElementById('newActivity').value) || 50;\n
-            const tech = parseInt(document.getElementById('newTech').value) || 50;\n
-            const comm = parseInt(document.getElementById('newComm').value) || 50;\n
-            \n
-            if (!name) { alert('Введите имя'); return; }\n
-            \n
-            managers.push({ id: Date.now(), name, position, level, finance, funnel, activity, tech, comm });\n
-            localStorage.setItem('gl_managers', JSON.stringify(managers));\n
-            \n
-            document.getElementById('newName').value = '';\n
-            document.getElementById('newPosition').value = '';\n
-            \n
-            alert('Менеджер добавлен!');\n
-            showTab('rating');\n
-            renderRating();\n
-        }\n
-        \n
-        function deleteManager(id) {\n
-            if (!confirm('Удалить менеджера?')) return;\n
-            managers = managers.filter(m => m.id !== id);\n
-            localStorage.setItem('gl_managers', JSON.stringify(managers));\n
-            showTab('rating');\n
-            renderRating();\n
-        }\n
-        \n
-        function updateWeights() {\n
-            weights.finance = parseInt(document.getElementById('weightFinance').value) || 25;\n
-            weights.funnel = parseInt(document.getElementById('weightFunnel').value) || 20;\n
-            weights.activity = parseInt(document.getElementById('weightActivity').value) || 10;\n
-            weights.tech = parseInt(document.getElementById('weightTech').value) || 15;\n
-            weights.comm = parseInt(document.getElementById('weightComm').value) || 10;\n
-            \n
-            const sum = weights.finance + weights.funnel + weights.activity + weights.tech + weights.comm;\n
-            document.getElementById('weightSum').textContent = sum;\n
-            document.getElementById('weightSum').style.color = sum === 100 ? '#009900' : '#E31E24';\n
-            \n
-            renderRating();\n
-        }\n
-        \n
-        function clearData() {\n
-            if (!confirm('Очистить все данные?')) return;\n
-            localStorage.removeItem('gl_managers');\n
-            managers = [...defaultManagers];\n
-            renderRating();\n
-            alert('Данные очищены!');\n
-        }\n
-        \n
-        function showTab(tabName) {\n
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));\n
-            document.querySelectorAll('.content').forEach(c => c.classList.add('hidden'));\n
-            document.getElementById(tabName).classList.remove('hidden');\n
-            event.target.classList.add('active');\n
-        }\n
-        \n
-        renderRating();\n
-        updateWeights();\n
-    </script>\n
-</body>\n
+            
+            document.getElementById('totalManagers').textContent = managers.length;
+            const avg = (sorted.reduce((sum, m) => sum + parseFloat(calculateRating(m)), 0) / sorted.length).toFixed(1);
+            document.getElementById('avgRating').textContent = avg;
+            document.getElementById('topScore').textContent = Math.max(...sorted.map(m => parseFloat(calculateRating(m))));
+        }
+        
+        function showManager(id) {
+            const m = managers.find(x => x.id === id);
+            if (!m) return;
+            const rating = calculateRating(m);
+            document.getElementById('managerDetail').innerHTML = '<div class="manager-card"><div class="manager-name">' + m.name + '</div><div class="manager-info">' + m.position + ' • ' + (m.level === 'junior' ? 'Junior' : m.level === 'middle' ? 'Middle' : 'Senior') + '</div></div><div style="text-align: center; margin: 24px 0;"><div style="font-size: 56px; font-weight: 700; color: #E31E24;">' + rating + '</div><div style="color: #666; font-size: 16px;">Общий рейтинг</div></div><div class="metrics-grid"><div class="metric-item"><div class="metric-score">' + m.finance + '</div><div class="metric-name">Финансы (' + weights.finance + '%)</div></div><div class="metric-item"><div class="metric-score">' + m.funnel + '</div><div class="metric-name">Воронка (' + weights.funnel + '%)</div></div><div class="metric-item"><div class="metric-score">' + m.activity + '</div><div class="metric-name">Активность (' + weights.activity + '%)</div></div><div class="metric-item"><div class="metric-score">' + m.tech + '</div><div class="metric-name">Техника (' + weights.tech + '%)</div></div><div class="metric-item"><div class="metric-score">' + m.comm + '</div><div class="metric-name">Коммуникация (' + weights.comm + '%)</div></div></div><button class="btn btn-danger" onclick="deleteManager(' + m.id + ')" style="margin-top: 24px;">Удалить менеджера</button>';
+            showTab('detail');
+        }
+        
+        function addManager() {
+            const name = document.getElementById('newName').value;
+            const position = document.getElementById('newPosition').value;
+            const level = document.getElementById('newLevel').value;
+            const finance = parseInt(document.getElementById('newFinance').value) || 50;
+            const funnel = parseInt(document.getElementById('newFunnel').value) || 50;
+            const activity = parseInt(document.getElementById('newActivity').value) || 50;
+            const tech = parseInt(document.getElementById('newTech').value) || 50;
+            const comm = parseInt(document.getElementById('newComm').value) || 50;
+            
+            if (!name) { alert('Введите имя'); return; }
+            
+            managers.push({ id: Date.now(), name, position, level, finance, funnel, activity, tech, comm });
+            localStorage.setItem('gl_managers', JSON.stringify(managers));
+            
+            document.getElementById('newName').value = '';
+            document.getElementById('newPosition').value = '';
+            
+            alert('Менеджер добавлен!');
+            showTab('rating');
+            renderRating();
+        }
+        
+        function deleteManager(id) {
+            if (!confirm('Удалить менеджера?')) return;
+            managers = managers.filter(m => m.id !== id);
+            localStorage.setItem('gl_managers', JSON.stringify(managers));
+            showTab('rating');
+            renderRating();
+        }
+        
+        function updateWeights() {
+            weights.finance = parseInt(document.getElementById('weightFinance').value) || 25;
+            weights.funnel = parseInt(document.getElementById('weightFunnel').value) || 20;
+            weights.activity = parseInt(document.getElementById('weightActivity').value) || 10;
+            weights.tech = parseInt(document.getElementById('weightTech').value) || 15;
+            weights.comm = parseInt(document.getElementById('weightComm').value) || 10;
+            
+            const sum = weights.finance + weights.funnel + weights.activity + weights.tech + weights.comm;
+            document.getElementById('weightSum').textContent = sum;
+            document.getElementById('weightSum').style.color = sum === 100 ? '#009900' : '#E31E24';
+            
+            renderRating();
+        }
+        
+        function clearData() {
+            if (!confirm('Очистить все данные?')) return;
+            localStorage.removeItem('gl_managers');
+            managers = [...defaultManagers];
+            renderRating();
+            alert('Данные очищены!');
+        }
+        
+        function showTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.content').forEach(c => c.classList.add('hidden'));
+            document.getElementById(tabName).classList.remove('hidden');
+            event.target.classList.add('active');
+        }
+        
+        renderRating();
+        updateWeights();
+    </script>
+</body>
 </html>
