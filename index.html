@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Гранд Лайн - Рейтинг менеджеров</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #F5F5F5; color: #1A1A1A; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 16px; }
+        
+        .header { 
+            background: #FFFFFF; 
+            padding: 20px 16px;
+            border-radius: 12px; 
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .logo-img {
+            height: 100px;
+            max-width: 95%;
+            object-fit: contain;
+        }
+        
+        /* Stats cards */
+        .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
+        .stat-card { background: white; padding: 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); text-align: center; }
+        .stat-value { font-size: 32px; font-weight: 700; color: #E31E24; }
+        .stat-label { font-size: 13px; color: #666; margin-top: 4px; }
+        
+        /* Tabs */
+        .tabs { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; }
+        .tab { padding: 12px 20px; background: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; white-space: nowrap; color: #666; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+        .tab.active { background: #E31E24; color: white; }
+        
+        .content { background: white; border-radius: 12px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .hidden { display: none; }
+        
+        /* DASHBOARD STYLES */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        
+        @media (min-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        .dash-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .dash-card h3 {
+            font-size: 16px;
+            color: #495057;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        /* Radar Chart */
+        .radar-container {
+            position: relative;
+            width: 250px;
+            height: 250px;
+            margin: 0 auto;
+        }
+        
+        .radar-svg {
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* Top 3 */
+        .top3-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .top3-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #E31E24;
+        }
+        
+        .top3-rank {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+        }
+        
+        .top3-rank.gold { background: #ffd700; color: #333; }
+        .top3-rank.silver { background: #c0c0c0; color: #333; }
+        .top3-rank.bronze { background: #cd7f32; color: white; }
+        
+        .top3-info { flex: 1; }
+        .top3-name { font-weight: 600; font-size: 15px; }
+        .top3-pos { font-size: 12px; color: #6c757d; }
+        .top3-score { font-size: 22px; font-weight: 700; color: #E31E24; }
+        
+        /* Metrics bars */
+        .metric-bar {
+            margin-bottom: 15px;
+        }
+        
+        .metric-bar-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-size: 13px;
+        }
+        
+        .metric-bar-label { color: #495057; }
+        .metric-bar-value { font-weight: 600; color: #E31E24; }
+        
+        .metric-bar-track {
+            height: 10px;
+            background: #e9ecef;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .metric-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #E31E24, #ff6b6b);
+            border-radius: 5px;
+            transition: width 0.3s ease;
+        }
+        
+        /* Mini chart */
+        .mini-chart {
+            height: 120px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            gap: 8px;
+            padding: 10px 0;
+        }
+        
+        .mini-bar {
+            flex: 1;
+            background: linear-gradient(to top, #E31E24, #ff8787);
+            border-radius: 4px 4px 0 0;
+            min-width: 20px;
+            transition: height 0.3s ease;
+            position: relative;
+        }
+        
+        .mini-bar-label {
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            color: #6c757d;
+            white-space: nowrap;
+        }
+        
+        .mini-bar-value {
+            position: absolute;
+            top: -18px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            font-weight: 600;
+            color: #E31E24;
+        }
+        
+        /* Table */
+        .table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        .table th { text-align: left; padding: 12px 8px; color: #666; font-weight: 600; border-bottom: 2px solid #E31E24; }
+        .table td { padding: 12px 8px; border-bottom: 1px solid #eee; }
+        .table tr:hover { background: #f9f9f9; }
+        .rank { font-weight: 700; font-size: 16px; }
+        .rank-1 { color: #E31E24; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 500; }
+        .badge-junior { background: #e8f4fd; color: #0066cc; }
+        .badge-middle { background: #f0e6ff; color: #6600cc; }
+        .badge-senior { background: #e6f7e6; color: #009900; }
+        .score { font-weight: 700; font-size: 18px; color: #E31E24; }
+        
+        /* Form */
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 14px; color: #666; margin-bottom: 6px; font-weight: 500; }
+        .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; }
+        .btn { padding: 14px 24px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; width: 100%; font-weight: 600; margin-bottom: 8px; }
+        .btn-primary { background: #E31E24; color: white; }
+        .btn-secondary { background: #f0f0f0; color: #333; }
+        .btn-danger { background: #1A1A1A; color: white; }
+        
+        /* Sliders */
+        .slider-container { margin-bottom: 20px; }
+        .slider-label { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; }
+        .slider-label span:first-child { color: #666; }
+        .slider-label span:last-child { color: #E31E24; font-weight: 600; }
+        .slider { width: 100%; height: 8px; border-radius: 4px; background: #e0e0e0; outline: none; -webkit-appearance: none; }
+        .slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 24px; height: 24px; border-radius: 50%; background: #E31E24; cursor: pointer; }
+        
+        .manager-card { background: #f9f9f9; padding: 16px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid #E31E24; }
+        .manager-name { font-weight: 600; font-size: 18px; margin-bottom: 4px; }
+        .manager-info { font-size: 14px; color: #666; }
+        
+        .metrics-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 16px; }
+        .metric-item { background: #f9f9f9; padding: 16px; border-radius: 8px; text-align: center; }
+        .metric-score { font-size: 24px; font-weight: 700; color: #E31E24; }
+        .metric-name { font-size: 12px; color: #666; margin-top: 4px; }
+        
+        .hint { color: #999; font-size: 13px; text-align: center; padding: 20px; }
+        
+        @media (max-width: 640px) {
+            .stats { grid-template-columns: repeat(2, 1fr); }
+            .table { font-size: 12px; }
+            .logo-img { height: 80px; }
+            .radar-container { width: 200px; height: 200px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Logo -->
+        <div class="header">
+            <img src="assets/logo.png" alt="Grand Line - Рейтинг менеджеров" class="logo-img">
+        </div>
+        
+        <!-- Stats -->
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="totalManagers">6</div>
+                <div class="stat-label">Менеджеров</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="avgRating">74.5</div>
+                <div class="stat-label">Средний рейтинг</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="topScore">85</div>
+                <div class="stat-label">Лучший результат</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">60/40</div>
+                <div class="stat-label">Кол/Кач</div>
+            </div>
+        </div>
+        
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('dashboard')">📊 Дашборд</button>
+            <button class="tab" onclick="showTab('rating')">🏆 Рейтинг</button>
+            <button class="tab" onclick="showTab('add')">➕ Добавить</button>
+            <button class="tab" onclick="showTab('settings')">⚙️ Настройки</button>
+        </div>
+        
+        <!-- TAB: DASHBOARD -->
+        <div id="dashboard" class="content">
+            <div class="dashboard-grid">
+                <!-- Radar Chart -->
+                <div class="dash-card">
+                    <h3>📈 Профиль компетенций (средний)</h3>
+                    <div class="radar-container">
+                        <svg class="radar-svg" viewBox="0 0 250 250">
+                            <!-- Background grid -->
+                            <polygon points="125,25 215,75 215,175 125,225 35,175 35,75" fill="none" stroke="#e9ecef" stroke-width="1"/>
+                            <polygon points="125,55 185,90 185,160 125,195 65,160 65,90" fill="none" stroke="#e9ecef" stroke-width="1"/>
+                            <polygon points="125,85 155,105 155,145 125,165 95,145 95,105" fill="none" stroke="#e9ecef" stroke-width="1"/>
+                            
+                            <!-- Axes -->
+                            <line x1="125" y1="125" x2="125" y2="25" stroke="#dee2e6" stroke-width="1"/>
+                            <line x1="125" y1="125" x2="215" y2="75" stroke="#dee2e6" stroke-width="1"/>
+                            <line x1="125" y1="125" x2="215" y2="175" stroke="#dee2e6" stroke-width="1"/>
+                            <line x1="125" y1="125" x2="125" y2="225" stroke="#dee2e6" stroke-width="1"/>
+                            <line x1="125" y1="125" x2="35" y2="175" stroke="#dee2e6" stroke-width="1"/>
+                            <line x1="125" y1="125" x2="35" y2="75" stroke="#dee2e6" stroke-width="1"/>
+                            
+                            <!-- Labels -->
+                            <text x="125" y="18" text-anchor="middle" font-size="11" fill="#6c757d">Финансы</text>
+                            <text x="225" y="70" text-anchor="start" font-size="11" fill="#6c757d">Воронка</text>
+                            <text x="225" y="185" text-anchor="start" font-size="11" fill="#6c757d">Активность</text>
+                            <text x="125" y="240" text-anchor="middle" font-size="11" fill="#6c757d">Техника</text>
+                            <text x="25" y="185" text-anchor="end" font-size="11" fill="#6c757d">Коммуникация</text>
+                            <text x="25" y="70" text-anchor="end" font-size="11" fill="#6c757d">LTV</text>
+                            
+                            <!-- Data polygon (will be updated by JS) -->
+                            <polygon id="radarData" points="125,45 195,85 195,165 125,205 55,165 55,85" fill="rgba(227,30,36,0.2)" stroke="#E31E24" stroke-width="2"/>
+                        </svg>
+                    </div>
+                </div>
+                
+                <!-- Top 3 -->
+                <div class="dash-card">
+                    <h3>🏆 Топ-3 менеджера</h3>
+                    <div class="top3-list" id="top3List">
+                        <!-- Filled by JS -->
+                    </div>
+                </div>
+                
+                <!-- Average Metrics -->
+                <div class="dash-card">
+                    <h3>📊 Средние показатели команды</h3>
+                    <div id="avgMetrics">
+                        <!-- Filled by JS -->
+                    </div>
+                </div>
+                
+                <!-- Distribution Chart -->
+                <div class="dash-card">
+                    <h3>📉 Распределение рейтингов</h3>
+                    <div class="mini-chart" id="distChart">
+                        <!-- Filled by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- TAB: RATING -->
+        <div id="rating" class="content hidden">
+            <p class="hint">👆 Нажмите на менеджера, чтобы редактировать</p>
+            <table class="table">
+                <thead>
+                    <tr><th>#</th><th>Менеджер</th><th>Опыт</th><th>Рейтинг</th><th>Финансы</th></tr>
+                </thead>
+                <tbody id="ratingTable"></tbody>
+            </table>
+        </div>
+        
+        <!-- TAB: ADD/EDIT -->
+        <div id="add" class="content hidden">
+            <h3 style="margin-bottom: 20px;" id="formTitle">Добавить менеджера</h3>
+            <input type="hidden" id="editId" value="">
+            
+            <div class="form-group">
+                <label>Имя</label>
+                <input type="text" id="newName" placeholder="Иван Иванов">
+            </div>
+            <div class="form-group">
+                <label>Должность</label>
+                <input type="text" id="newPosition" placeholder="Менеджер по продажам">
+            </div>
+            <div class="form-group">
+                <label>Уровень</label>
+                <select id="newLevel">
+                    <option value="junior">Junior (&lt; 6 мес)</option>
+                    <option value="middle" selected>Middle (6 мес - 2 года)</option>
+                    <option value="senior">Senior (&gt; 2 года)</option>
+                </select>
+            </div>
+            
+            <div class="slider-container">
+                <div class="slider-label"><span>Финансы</span><span id="valFinance">75</span></div>
+                <input type="range" id="newFinance" class="slider" min="0" max="100" value="75" oninput="updateSlider('Finance')">
+            </div>
+            
+            <div class="slider-container">
+                <div class="slider-label"><span>Воронка</span><span id="valFunnel">70</span></div>
+                <input type="range" id="newFunnel" class="slider" min="0" max="100" value="70" oninput="updateSlider('Funnel')">
+            </div>
+            
+            <div class="slider-container">
+                <div class="slider-label"><span>Активность</span><span id="valActivity">80</span></div>
+                <input type="range" id="newActivity" class="slider" min="0" max="100" value="80" oninput="updateSlider('Activity')">
+            </div>
+            
+            <div class="slider-container">
+                <div class="slider-label"><span>Техника переговоров</span><span id="valTech">70</span></div>
+                <input type="range" id="newTech" class="slider" min="0" max="100" value="70" oninput="updateSlider('Tech')">
+            </div>
+            
+            <div class="slider-container">
+                <div class="slider-label"><span>Коммуникация</span><span id="valComm">75</span></div>
+                <input type="range" id="newComm" class="slider" min="0" max="100" value="75" oninput="updateSlider('Comm')">
+            </div>
+            
+            <button class="btn btn-primary" id="saveBtn" onclick="saveManager()">Добавить менеджера</button>
+            <button class="btn btn-secondary hidden" id="cancelBtn" onclick="cancelEdit()">Отмена</button>
+            <button class="btn btn-danger hidden" id="deleteBtn" onclick="deleteCurrentManager()">🗑️ Удалить менеджера</button>
+        </div>
+        
+        <!-- TAB: SETTINGS -->
+        <div id="settings" class="content hidden">
+            <h3 style="margin-bottom: 20px;">Веса метрик (всего должно быть 100%)</h3>
+            
+            <div class="slider-container">
+                <div class="slider-label"><span>Финансы (%)</span><span id="weightValFinance">25</span></div>
+                <input type="range" id="weightFinance" class="slider" min="0" max="50" value="25" oninput="updateWeightSlider('Finance')">
+            </div>
+            
+            <div class="slider-container">
+                <div class="slider-label"><span>Воронка (%)</span><span id="weightValFunnel">20</span></div>
+                <input type="range" id="weightFunnel" class="slider" min="0" max="50" value="20" oninput="updateWeightSlider('Funnel')">
+            </div>
+            
+            <div class="slider-container">
+                <div class="slider-label"><span>Активность (%)</span><span id="weightValActivity">10</span></div>
+                <input type="range" id="weightActivity" class="slider" min="0" max="50" value="10" oninput="updateWeightSlider('Activity')">
+            </div>
+            
+            <div class="slider-container">
+                <div class="slider-label"><span>Техника (%)</span><span id="weightValTech">15</span></div>
+                <input type="range" id="weightTech" class="slider" min="0" max="50" value="15" oninput="updateWeightSlider('Tech')">
+            </div>
+            
+            <div class="slider-container">
+                <div class="slider-label"><span>Коммуникация (%)</span><span id="weightValComm">10</span></div>
+                <input type="range" id="weightComm" class="slider" min="0" max="50" value="10" oninput="updateWeightSlider('Comm')">
+            </div>
+            
+            <p style="color: #666; font-size: 14px; margin: 20px 0; text-align: center;">
+                Сумма: <span id="weightSum" style="font-weight: 700; color: #E31E24;">80</span>%
+            </p>
+            
+            <button class="btn btn-danger" onclick="clearData()">🗑️ Очистить все данные</button>
+        </div>
+    </div>
+
+    <script>
+        // Default data
+        const defaultManagers = [
+            { id: 1, name: 'Александр Петров', position: 'Менеджер B2B', level: 'middle', finance: 82, funnel: 76, activity: 85, tech: 70, comm: 74 },
+            { id: 2, name: 'Елена Смирнова', position: 'Старший менеджер', level: 'senior', finance: 78, funnel: 72, activity: 80, tech: 73, comm: 70 },
+            { id: 3, name: 'Дмитрий Иванов', position: 'Менеджер', level: 'junior', finance: 70, funnel: 68, activity: 75, tech: 65, comm: 62 },
+            { id: 4, name: 'Мария Козлова', position: 'Менеджер', level: 'middle', finance: 75, funnel: 70, activity: 78, tech: 68, comm: 72 },
+            { id: 5, name: 'Сергей Новиков', position: 'Ведущий менеджер', level: 'senior', finance: 72, funnel: 74, activity: 70, tech: 75, comm: 68 },
+            { id: 6, name: 'Анна Морозова', position: 'Менеджер', level: 'junior', finance: 65, funnel: 62, activity: 70, tech: 58, comm: 60 }
+        ];
+        
+        let weights = { finance: 25, funnel: 20, activity: 10, tech: 15, comm: 10 };
+        let managers = JSON.parse(localStorage.getItem('gl_managers')) || defaultManagers;
+        let editingId = null;
+        
+        // Calculate rating
+        function calculateRating(m) {
+            const quantitative = (m.finance * weights.finance + m.funnel * weights.funnel + m.activity * weights.activity) / (weights.finance + weights.funnel + weights.activity);
+            const qualitative = (m.tech * weights.tech + m.comm * weights.comm) / (weights.tech + weights.comm);
+            const totalQuantWeight = weights.finance + weights.funnel + weights.activity;
+            const totalQualWeight = weights.tech + weights.comm;
+            const totalWeight = totalQuantWeight + totalQualWeight;
+            return ((quantitative * totalQuantWeight + qualitative * totalQualWeight) / totalWeight).toFixed(1);
+        }
+        
+        // Update dashboard
+        function updateDashboard() {
+            const sorted = [...managers].sort((a, b) => calculateRating(b) - calculateRating(a));
+            
+            // Stats
+            document.getElementById('totalManagers').textContent = managers.length;
+            const avg = (sorted.reduce((sum, m) => sum + parseFloat(calculateRating(m)), 0) / sorted.length).toFixed(1);
+            document.getElementById('avgRating').textContent = avg;
+            document.getElementById('topScore').textContent = Math.max(...sorted.map(m => parseFloat(calculateRating(m))));
+            
+            // Top 3
+            const top3Html = sorted.slice(0, 3).map((m, i) => {
+                const rating = calculateRating(m);
+                const rankClass = i === 0 ? 'gold' : i === 1 ? 'silver' : 'bronze';
+                return `
+                    <div class="top3-item">
+                        <div class="top3-rank ${rankClass}">${i + 1}</div>
+                        <div class="top3-info">
+                            <div class="top3-name">${m.name}</div>
+                            <div class="top3-pos">${m.position}</div>
+                        </div>
+                        <div class="top3-score">${rating}</div>
+                    </div>
+                `;
+            }).join('');
+            document.getElementById('top3List').innerHTML = top3Html;
+            
+            // Average metrics bars
+            const avgFinance = (managers.reduce((s, m) => s + m.finance, 0) / managers.length).toFixed(0);
+            const avgFunnel = (managers.reduce((s, m) => s + m.funnel, 0) / managers.length).toFixed(0);
+            const avgActivity = (managers.reduce((s, m) => s + m.activity, 0) / managers.length).toFixed(0);
+            const avgTech = (managers.reduce((s, m) => s + m.tech, 0) / managers.length).toFixed(0);
+            const avgComm = (managers.reduce((s, m) => s + m.comm, 0) / managers.length).toFixed(0);
+            
+            document.getElementById('avgMetrics').innerHTML = `
+                <div class="metric-bar">
+                    <div class="metric-bar-header">
+                        <span class="metric-bar-label">Финансы (${weights.finance}%)</span>
+                        <span class="metric-bar-value">${avgFinance}</span>
+                    </div>
+                    <div class="metric-bar-track">
+                        <div class="metric-bar-fill" style="width: ${avgFinance}%"></div>
+                    </div>
+                </div>
+                <div class="metric-bar">
+                    <div class="metric-bar-header">
+                        <span class="metric-bar-label">Воронка (${weights.funnel}%)</span>
+                        <span class="metric-bar-value">${avgFunnel}</span>
+                    </div>
+                    <div class="metric-bar-track">
+                        <div class="metric-bar-fill" style="width: ${avgFunnel}%"></div>
+                    </div>
+                </div>
+                <div class="metric-bar">
+                    <div class="metric-bar-header">
+                        <span class="metric-bar-label">Активность (${weights.activity}%)</span>
+                        <span class="metric-bar-value">${avgActivity}</span>
+                    </div>
+                    <div class="metric-bar-track">
+                        <div class="metric-bar-fill" style="width: ${avgActivity}%"></div>
+                    </div>
+                </div>
+                <div class="metric-bar">
+                    <div class="metric-bar-header">
+                        <span class="metric-bar-label">Техника (${weights.tech}%)</span>
+                        <span class="metric-bar-value">${avgTech}</span>
+                    </div>
+                    <div class="metric-bar-track">
+                        <div class="metric-bar-fill" style="width: ${avgTech}%"></div>
+                    </div>
+                </div>
+                <div class="metric-bar">
+                    <div class="metric-bar-header">
+                        <span class="metric-bar-label">Коммуникация (${weights.comm}%)</span>
+                        <span class="metric-bar-value">${avgComm}</span>
+                    </div>
+                    <div class="metric-bar-track">
+                        <div class="metric-bar-fill" style="width: ${avgComm}%"></div>
+                    </div>
+                </div>
+            `;
+            
+            // Update radar chart
+            updateRadarChart(avgFinance, avgFunnel, avgActivity, avgTech, avgComm);
+            
+            // Distribution chart
+            const ranges = [0, 0, 0, 0, 0]; // <60, 60-70, 70-80, 80-90, 90-100
+            sorted.forEach(m => {
+                const r = parseFloat(calculateRating(m));
+                if (r < 60) ranges[0]++;
+                else if (r < 70) ranges[1]++;
+                else if (r < 80) ranges[2]++;
+                else if (r < 90) ranges[3]++;
+                else ranges[4]++;
+            });
+            
+            const maxCount = Math.max(...ranges, 1);
+            document.getElementById('distChart').innerHTML = ranges.map((c, i) => {
+                const labels = ['<60', '60-70', '70-80', '80-90', '90+'];
+                const height = (c / maxCount) * 80;
+                return `<div class="mini-bar" style="height: ${height + 20}%"><span class="mini-bar-value">${c}</span><span class="mini-bar-label">${labels[i]}</span></div>`;
+            }).join('');
+        }
+        
+        // Update radar chart
+        function updateRadarChart(f, fu, a, t, c) {
+            const center = 125;
+            const maxRadius = 100;
+            
+            // Calculate points for each metric (0-100 mapped to radius)
+            const getPoint = (value, angle) => {
+                const radius = (value / 100) * maxRadius;
+                const rad = (angle - 90) * Math.PI / 180;
+                return `${center + radius * Math.cos(rad)},${center + radius * Math.sin(rad)}`;
+            };
+            
+            const points = [
+                getPoint(f, 0),      // Top (Finance)
+                getPoint(fu, 60),    // Top-right (Funnel)
+                getPoint(a, 120),    // Bottom-right (Activity)
+                getPoint(t, 180),    // Bottom (Tech)
+                getPoint(c, 240),    // Bottom-left (Comm)
+                getPoint(50, 300)    // Top-left (LTV placeholder)
+            ].join(' ');
+            
+            document.getElementById('radarData').setAttribute('points', points);
+        }
+        
+        // Render rating table
+        function renderRating() {
+            const sorted = [...managers].sort((a, b) => calculateRating(b) - calculateRating(a));
+            const tbody = document.getElementById('ratingTable');
+            tbody.innerHTML = sorted.map((m, i) => {
+                const rating = calculateRating(m);
+                let rankClass = i === 0 ? 'rank-1' : '';
+                let badgeClass = `badge-${m.level}`;
+                let levelText = m.level === 'junior' ? 'Junior' : m.level === 'middle' ? 'Middle' : 'Senior';
+                return '<tr onclick="editManager(' + m.id + ')" style="cursor: pointer;"><td class="rank ' + rankClass + '">' + (i + 1) + '</td><td><div style="font-weight: 600;">' + m.name + '</div><div style="font-size: 12px; color: #666;">' + m.position + '</div></td><td><span class="badge ' + badgeClass + '">' + levelText + '</span></td><td class="score">' + rating + '</td><td>' + m.finance + '</td></tr>';
+            }).join('');
+            
+            updateDashboard();
+        }
+        
+        // Update slider display
+        function updateSlider(name) {
+            const val = document.getElementById('new' + name).value;
+            document.getElementById('val' + name).textContent = val;
+        }
+        
+        function updateWeightSlider(name) {
+            const val = document.getElementById('weight' + name).value;
+            document.getElementById('weightVal' + name).textContent = val;
+            weights[name.toLowerCase()] = parseInt(val);
+            updateWeightSum();
+            renderRating();
+        }
+        
+        function updateWeightSum() {
+            const sum = weights.finance + weights.funnel + weights.activity + weights.tech + weights.comm;
+            document.getElementById('weightSum').textContent = sum;
+            document.getElementById('weightSum').style.color = sum === 100 ? '#22c55e' : '#E31E24';
+        }
+        
+        // Save manager
+        function saveManager() {
+            const name = document.getElementById('newName').value;
+            const position = document.getElementById('newPosition').value;
+            const level = document.getElementById('newLevel').value;
+            const finance = parseInt(document.getElementById('newFinance').value);
+            const funnel = parseInt(document.getElementById('newFunnel').value);
+            const activity = parseInt(document.getElementById('newActivity').value);
+            const tech = parseInt(document.getElementById('newTech').value);
+            const comm = parseInt(document.getElementById('newComm').value);
+            
+            if (!name) { alert('Введите имя'); return; }
+            
+            if (editingId) {
+                const idx = managers.findIndex(m => m.id === editingId);
+                if (idx >= 0) {
+                    managers[idx] = { id: editingId, name, position, level, finance, funnel, activity, tech, comm };
+                }
+                editingId = null;
+            } else {
+                managers.push({ id: Date.now(), name, position, level, finance, funnel, activity, tech, comm });
+            }
+            
+            localStorage.setItem('gl_managers', JSON.stringify(managers));
+            resetForm();
+            showTab('dashboard');
+            renderRating();
+        }
+        
+        // Edit manager
+        function editManager(id) {
+            const m = managers.find(x => x.id === id);
+            if (!m) return;
+            
+            editingId = id;
+            document.getElementById('formTitle').textContent = 'Редактировать менеджера';
+            document.getElementById('saveBtn').textContent = 'Сохранить изменения';
+            document.getElementById('cancelBtn').classList.remove('hidden');
+            document.getElementById('deleteBtn').classList.remove('hidden');
+            
+            document.getElementById('newName').value = m.name;
+            document.getElementById('newPosition').value = m.position;
+            document.getElementById('newLevel').value = m.level;
+            document.getElementById('newFinance').value = m.finance;
+            document.getElementById('newFunnel').value = m.funnel;
+            document.getElementById('newActivity').value = m.activity;
+            document.getElementById('newTech').value = m.tech;
+            document.getElementById('newComm').value = m.comm;
+            
+            updateSlider('Finance');
+            updateSlider('Funnel');
+            updateSlider('Activity');
+            updateSlider('Tech');
+            updateSlider('Comm');
+            
+            showTab('add');
+        }
+        
+        // Cancel edit
+        function cancelEdit() {
+            resetForm();
+            showTab('rating');
+        }
+        
+        // Delete current manager
+        function deleteCurrentManager() {
+            if (!editingId) return;
+            if (!confirm('Удалить менеджера?')) return;
+            managers = managers.filter(m => m.id !== editingId);
+            localStorage.setItem('gl_managers', JSON.stringify(managers));
+            resetForm();
+            showTab('dashboard');
+            renderRating();
+        }
+        
+        // Reset form
+        function resetForm() {
+            editingId = null;
+            document.getElementById('formTitle').textContent = 'Добавить менеджера';
+            document.getElementById('saveBtn').textContent = 'Добавить менеджера';
+            document.getElementById('cancelBtn').classList.add('hidden');
+            document.getElementById('deleteBtn').classList.add('hidden');
+            document.getElementById('newName').value = '';
+            document.getElementById('newPosition').value = '';
+            document.getElementById('newFinance').value = 75;
+            document.getElementById('newFunnel').value = 70;
+            document.getElementById('newActivity').value = 80;
+            document.getElementById('newTech').value = 70;
+            document.getElementById('newComm').value = 75;
+            updateSlider('Finance');
+            updateSlider('Funnel');
+            updateSlider('Activity');
+            updateSlider('Tech');
+            updateSlider('Comm');
+        }
+        
+        // Clear all data
+        function clearData() {
+            if (!confirm('Очистить все данные?')) return;
+            localStorage.removeItem('gl_managers');
+            managers = [...defaultManagers];
+            renderRating();
+            alert('Данные очищены!');
+        }
+        
+        // Tab switching
+        function showTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.content').forEach(c => c.classList.add('hidden'));
+            document.getElementById(tabName).classList.remove('hidden');
+            event.target.classList.add('active');
+        }
+        
+        // Init
+        renderRating();
+        updateWeightSum();
+    </script>
+</body>
+</html>
